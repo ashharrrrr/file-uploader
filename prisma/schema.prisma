@@ -13,12 +13,49 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  password     String
+  rootFolderId String?  @unique
+  folders      Folder[]
+  files        File[]
+  rootFolder   Folder?  @relation("UserRootFolder", fields: [rootFolderId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model File {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  fileKey   String   @unique
+  mimeType  String?
+  size      Int?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folderId  String
+  folder    Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([folderId, name])
+}
+
+model Folder {
+  id        String   @id @default(cuid())
+  name      String
+  path      String
+  userId    String
+  parentId  String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent    Folder?  @relation("FolderTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Folder[] @relation("FolderTree")
+  files     File[]
+  rootOwner User?    @relation("UserRootFolder")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, parentId, name])
 }
 
 model Session {

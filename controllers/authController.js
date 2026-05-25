@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { db } from "../db/queries.js";
 import passport from "passport";
 import "../strategies/passportlocal.config.js";
+import { prisma } from "../lib/prisma.js";
 
 export async function indexGet(req, res) {
   if (!req.user) return res.redirect("/login");
@@ -12,10 +13,39 @@ export async function indexGet(req, res) {
 export const signUpUser = [
   async (req, res, next) => {
     try {
-      const { name, email, password } = req.body;
+      const { name, email, password } = req.body; 
       const hashedPassword = await bcrypt.hash(password, 10);
       await db.addUser(name, email, hashedPassword);
+
+      let rootFolder = await prisma.folder.create({
+        data: {
+            name: "My Drive",
+            userId: user.id,
+            parentId: null,
+            path: "temp"
+        }
+      });
+
+      rootFolder = await prisma.folder.update({
+        where: {
+            id: rootFolder.id
+        }, 
+        data: {
+            path: `/${rootFolder.id}`
+        }
+      });
+
+      await prisma.user.update({
+        where: {
+            id: user.id
+        },
+        data: {
+            rootFolderId: rootFolder.id
+        }
+      })
+
       res.redirect("/login");
+
     } catch (err) {
       if (err.code === "P2002") {
         return res.status(409).render("signUp", {
@@ -23,7 +53,11 @@ export const signUpUser = [
           old: req.body,
         });
       }
-      next(err);
+      console.error(err);
+      return res.status(500).render("signUp", {
+        errors: [{msg: "Signup Failed!"}],
+        old: req.body,
+      })
     }
   },
 ];

@@ -1,13 +1,16 @@
 import express from "express";
 import { fileURLToPath } from "url";
 import path, { dirname } from "path";
-import indexRouter from "./routes/indexrouter.js";
+import indexRouter from "./routes/auth.routes.js";
 import session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import "dotenv/config";
 import passport from "passport";
 import "./strategies/passportlocal.config.js";
 import { prisma } from "./lib/prisma.js";
+import authRouter from "./routes/auth.routes.js";
+import folderRouter from "./routes/folder.routes.js";
+import fileRouter from "./routes/file.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -38,7 +41,9 @@ const assetPath = path.join(__dirname, "public");
 app.use(express.static(assetPath));
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/", indexRouter);
+app.use("/", authRouter);
+app.use("/folders", folderRouter);
+app.use("/files", fileRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

@@ -1,0 +1,35 @@
+<form
+  action="/upload"
+  method="post"
+  enctype="multipart/form-data"
+  class="inline-block max-w-xs float-left">
+  <label for="uploaded_file" class="inline-block w-full">
+    <div
+      class="mt-2 flex items-center justify-center px-6 pt-5 pb-6 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 bg-white">
+      <div class="space-y-1 text-center">
+        <svg
+          class="mx-auto h-12 w-12 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.5"
+            d="M12 4v16m8-8H4" />
+        </svg>
+        <div class="flex text-sm text-gray-600">
+          <p class="mr-1">Click to upload</p>
+        </div>
+        <p class="text-xs text-gray-500">SVG, PNG, JPG up to 10MB</p>
+      </div>
+    </div>
+  </label>
+  <input id="uploaded_file" type="file" name="uploaded_file" class="hidden" />
+  <button
+    type="submit"
+    class="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
+    Upload
+  </button>
+</form>
