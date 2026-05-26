@@ -6,7 +6,6 @@ export const createFolder = [
     try {
       const userId = req.user.id;
 
-
       const { name, parentId } = req.body;
 
       const parentFolder = await prisma.folder.findFirst({
@@ -15,7 +14,6 @@ export const createFolder = [
           userId,
         },
       });
-
 
       if (!parentFolder) {
         req.flash("error", "Parent folder not found.");
@@ -55,11 +53,9 @@ export const createFolder = [
 
 export async function getFolder(req, res, next) {
   try {
-
     const userId = req.user.id;
 
     const folderId = req.params.folderId;
-
 
     const data = await getFolderData(folderId, userId);
 
@@ -73,9 +69,10 @@ export async function getFolder(req, res, next) {
   }
 }
 
-/*export async function renameFolder(req, res, next) {
+export async function renameFolder(req, res, next) {
   try {
     const { name, folderId } = req.body;
+    console.log("BODY", req.body);
 
     const folder = await prisma.folder.findFirst({
       where: {
@@ -105,7 +102,58 @@ export async function getFolder(req, res, next) {
       return res.redirect(`/folders/${req.body.folderId}`);
     }
     console.error(err);
-    req.flash("error", "Server Error");
+    req.flash("error", err.message);
     return res.redirect(`/folders/${req.body.folderId}`);
   }
-}*/
+}
+
+export async function renameGet(req, res, next) {
+  const userId = req.user.id;
+
+  const folderId = req.params.folderId;
+
+  const { currentFolder } = await getFolderData(folderId, userId);
+
+  res.render("renameFolder", {
+    currentFolder,
+  });
+}
+
+export async function deleteFolder(req, res, next) {
+  try {
+    const folder = await prisma.folder.findFirst({
+      where: {
+        id: req.params.folderId,
+        userId: req.user.id,
+      },
+    });
+
+    if (!folder) {
+      req.flash("error", "Folder not found");
+
+      return res.redirect("back");
+    }
+
+    if (!folder.parentId) {
+      req.flash("error", "Cannot delete root folder");
+
+      return res.redirect("back");
+    }
+
+    await prisma.folder.delete({
+      where: {
+        id: folder.id,
+      },
+    });
+
+    req.flash("success", "Folder deleted");
+
+    return res.redirect(`/folders/${folder.parentId}`);
+  } catch (err) {
+    console.error(err);
+
+    req.flash("error", "Failed to delete folder");
+
+    return res.redirect("back");
+  }
+}

@@ -1,18 +1,121 @@
-<nav aria-label="Breadcrumb" class="text-sm text-gray-600">
-    <% if (typeof pathString !== 'undefined' && pathString && pathString.length) { %>
-        <ol class="flex items-center gap-1">
-            <% pathString.forEach((folder, index) => { %>
-                <li class="flex items-center">
-                    <a href="/folders/<%= folder.id %>" class="text-gray-700 hover:text-blue-600"><%= folder.name %></a>
-                    <% if (index !== pathString.length - 1) { %>
-                        <svg class="w-4 h-4 text-gray-400 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    <% } %>
-                </li>
-            <% }) %>
-        </ol>
-    <% } else { %>
-        <div class="text-gray-500">Home</div>
+<div class="flex items-center justify-between gap-4 mb-6">
+
+    <nav
+        aria-label="Breadcrumb"
+        class="text-sm text-gray-600 overflow-x-auto"
+    >
+
+        <% if (
+            typeof pathString !== 'undefined' &&
+            pathString &&
+            pathString.length
+        ) { %>
+
+            <ol class="flex items-center gap-1 whitespace-nowrap">
+
+                <% pathString.forEach((folder, index) => { %>
+
+                    <li class="flex items-center">
+
+                        <a
+                            href="/folders/<%= folder.id %>"
+                            class="
+                                text-gray-700
+                                hover:text-blue-600
+                                transition
+                                font-medium
+                            "
+                        >
+                            <%= folder.name %>
+                        </a>
+
+                        <% if (index !== pathString.length - 1) { %>
+
+                            <svg
+                                class="w-4 h-4 text-gray-400 mx-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5l7 7-7 7"
+                                />
+                            </svg>
+
+                        <% } %>
+
+                    </li>
+
+                <% }) %>
+
+            </ol>
+
+        <% } else { %>
+
+            <div class="text-gray-500">
+                Home
+            </div>
+
+        <% } %>
+
+    </nav>
+
+
+    <% if (currentFolder.parentId) { %>
+
+        <div class="flex items-center gap-2 flex-shrink-0">
+
+            <a
+                href="/folders/rename/<%= currentFolder.id %>"
+                class="
+                    inline-flex items-center justify-center
+                    px-4 py-2
+                    rounded-xl
+                    border border-gray-200
+                    bg-white
+                    text-sm font-medium
+                    text-gray-700
+                    hover:bg-gray-50
+                    hover:border-gray-300
+                    transition
+                "
+            >
+                Rename
+            </a>
+
+            <form
+                action="/folders/delete/<%= currentFolder.id %>?_method=DELETE"
+                method="POST"
+                onsubmit="return confirm('Delete this folder and all its contents?')"
+                class="m-0"
+            >
+
+                <button
+                    type="submit"
+                    class="
+                        inline-flex items-center justify-center
+                        px-4 py-2
+                        rounded-xl
+                        bg-red-500
+                        text-white
+                        text-sm font-medium
+                        hover:bg-red-600
+                        active:scale-[0.98]
+                        transition
+                    "
+                >
+                    Delete
+                </button>
+
+            </form>
+
+        </div>
+
     <% } %>
-</nav>
+
+</div>
+

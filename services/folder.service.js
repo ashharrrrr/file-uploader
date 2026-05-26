@@ -9,10 +9,7 @@ export async function getFolderData(folderId, userId) {
   });
 
   if (!currentFolder) {
-    return res.status(404).render("index", {
-      errors: [{ msg: "Folder not found!" }],
-      old: req.body,
-    });
+    throw new Error("Folder Not Found!")
   }
 
   const folders = await prisma.folder.findMany({
