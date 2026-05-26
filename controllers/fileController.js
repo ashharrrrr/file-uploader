@@ -1,39 +1,80 @@
+console.log("UPLOAD CONTROLLER HIT");
 import { prisma } from "../lib/prisma.js";
+import crypto from "crypto";
+import supabase from "../lib/supabase.js";
+import path from "path";
 
 export async function uploadFile(req, res, next) {
   try {
-    const userId = req.user.id;
-    const folderId = req.body.folderId;
+    const { fileName, mimeType, size, folderId } = req.body;
 
-    const file = req.file;
+    const allowedTypes = [
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "application/pdf",
+      "text/plain",
+    ];
 
-    const folder = await prisma.folder.findFirst({
-      where: {
-        id: folderId,
-        userId,
-      },
-    });
-
-    if (!folder) {
-      req.flash("error", "Folder Not Found");
-      return res.redirect(`/folders/${folderId}`);
+    if (!allowedTypes.includes(mimeType)) {
+      return res.status(400).json({
+        error: "Invalid file type",
+      });
     }
+
+    if (size > 10 * 1024 * 1024) {
+      return res.status(400).json({
+        error: "File too large",
+      });
+    }
+
+    const extension = fileName.split(".").pop();
+
+    const fileKey = crypto.randomUUID();
+
+    const storagePath = `${req.user.id}/${fileKey}.${extension}`;
+
+    const { data, error } = await supabase.storage
+      .from("drive-files")
+      .createSignedUploadUrl(storagePath);
+
+    if (error) {
+      throw error;
+    }
+
+    console.log("Creating prisma file...");
 
     await prisma.file.create({
       data: {
-        name: file.originalname,
-        fileKey: file.filename,
-        size: file.size,
-        mimeType: file.mimeType,
-        userId,
+        name: fileName,
+
+        fileKey,
+
+        storagePath,
+
+        mimeType,
+
+        size,
+
+        userId: req.user.id,
+
         folderId,
       },
     });
 
-    res.redirect(`/folders/${folderId}`);
+    console.log("Prisma file created.");
+
+    return res.json({
+      token: data.token,
+      path: storagePath,
+    });
   } catch (err) {
     console.error(err);
-    req.flash("error", "Upload Failed!");
-    res.redirect(`/folders/${req.body.folderId}`);
+
+    return res.status(500).json({
+      error: err.message,
+    });
   }
-};
+}
+
+

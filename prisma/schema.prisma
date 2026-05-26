@@ -26,17 +26,18 @@ model User {
 }
 
 model File {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  fileKey   String   @unique
-  mimeType  String?
-  size      Int?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  folderId  String
-  folder    Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  name        String   
+  fileKey     String   @unique
+  mimeType    String?
+  size        Int?
+  storagePath String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folderId    String
+  folder      Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@unique([folderId, name])
 }

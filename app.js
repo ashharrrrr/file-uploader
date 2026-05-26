@@ -1,10 +1,9 @@
+import "dotenv/config";
 import express from "express";
 import { fileURLToPath } from "url";
 import path, { dirname } from "path";
-import indexRouter from "./routes/auth.routes.js";
 import session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
-import "dotenv/config";
 import passport from "passport";
 import "./strategies/passportlocal.config.js";
 import { prisma } from "./lib/prisma.js";
@@ -12,6 +11,7 @@ import authRouter from "./routes/auth.routes.js";
 import folderRouter from "./routes/folder.routes.js";
 import fileRouter from "./routes/file.routes.js";
 import flash from "connect-flash";
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -50,6 +50,7 @@ app.use((req, res, next) => {
 
 const assetPath = path.join(__dirname, "public");
 app.use(express.static(assetPath));
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/", authRouter);
