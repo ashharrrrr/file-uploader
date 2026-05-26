@@ -1,5 +1,5 @@
 <form
-  action="/upload"
+  action="/files/upload"
   method="post"
   enctype="multipart/form-data"
   class="inline-block max-w-xs float-left">
@@ -27,6 +27,7 @@
     </div>
   </label>
   <input id="uploaded_file" type="file" name="uploaded_file" class="hidden" />
+  <input type="hidden" name="folderId" value="<%= currentFolder.id %>" />
   <button
     type="submit"
     class="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 hover:cursor-pointer">

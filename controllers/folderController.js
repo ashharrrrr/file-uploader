@@ -6,7 +6,6 @@ export const createFolder = [
     try {
       const userId = req.user.id;
 
-      console.log("createFOlder", req.body);
 
       const { name, parentId } = req.body;
 
@@ -17,15 +16,10 @@ export const createFolder = [
         },
       });
 
-      console.log("PARENT FOLDER", parentFolder)
 
       if (!parentFolder) {
-        console.log("THIS IS EXECUTING!!")
-        return res.status(409).render("index", {
-          errors: [{ msg: "Parent folder not found." }],
-          old: req.body,
-          user: req.user,
-        });
+        req.flash("error", "Parent folder not found.");
+        return res.redirect(`/folders/${parentId}`);
       }
 
       let folder = await prisma.folder.create({
@@ -37,7 +31,6 @@ export const createFolder = [
         },
       });
 
-      console.log("FOLDER", folder)
       folder = await prisma.folder.update({
         where: {
           id: folder.id,
@@ -47,20 +40,15 @@ export const createFolder = [
         },
       });
 
-      console.log("PARENT ID", parentId);
       res.redirect(`/folders/${parentId}`);
     } catch (err) {
       if (err.code === "P2002") {
-        return res.status(409).render("index", {
-          errors: [{ msg: "Folder with this name already exists!" }],
-          old: req.body,
-        });
+        req.flash("error", "Folder with this name already exists!");
+        return res.redirect(`/folders/${req.body.parentId}`);
       }
       console.error("PRISMA ERROR", err);
-      return res.status(500).render("index", {
-        errors: [{ msg: "Failed to create folder." }],
-        old: req.body,
-      });
+      req.flash("error", "Failed to create folder.");
+      return res.redirect(`/folders/${req.body.parentId}`);
     }
   },
 ];
@@ -68,26 +56,56 @@ export const createFolder = [
 export async function getFolder(req, res, next) {
   try {
 
-    console.log("SETP 1")
-
     const userId = req.user.id;
 
     const folderId = req.params.folderId;
 
-    console.log("SETP 2", folderId)
 
     const data = await getFolderData(folderId, userId);
 
-    console.log("STEP 3", data)
-
     res.render("index", {
-        ...data
+      ...data,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).render("index", {
-      errors: [{ msg: "Failed to load folder." }],
-      old: req.body,
-    });
+    req.flash("error", "Failed to load folder.");
+    res.redirect(`/folders/${req.params.folderId}`);
   }
 }
+
+/*export async function renameFolder(req, res, next) {
+  try {
+    const { name, folderId } = req.body;
+
+    const folder = await prisma.folder.findFirst({
+      where: {
+        id: folderId,
+        userId: req.user.id,
+      },
+    });
+
+    if (!folder) {
+      req.flash("error", "Folder you're trying to rename does not exist!");
+      return res.redirect(`/folders/${folderId}`);
+    }
+
+    await prisma.folder.update({
+      where: {
+        id: folderId,
+      },
+      data: {
+        name,
+      },
+    });
+
+    res.redirect(`/folders/${folderId}`);
+  } catch (err) {
+    if (err.code === "P2002") {
+      req.flash("error", "Folder by this name already exists!");
+      return res.redirect(`/folders/${req.body.folderId}`);
+    }
+    console.error(err);
+    req.flash("error", "Server Error");
+    return res.redirect(`/folders/${req.body.folderId}`);
+  }
+}*/

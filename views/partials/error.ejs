@@ -1,0 +1,118 @@
+<% if (errorMessages.length > 0) { %>
+
+  <div
+    id="toast-error"
+    class="fixed top-6 right-6 z-50 w-full max-w-sm rounded-2xl border border-gray-200 bg-white shadow-xl px-5 py-4 flex items-start gap-4 opacity-0 translate-y-2 animate-toast-in"
+  >
+
+    <div class="mt-0.5 text-red-500">
+      <svg
+        class="w-5 h-5"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M18 10A8 8 0 11 2 10a8 8 0 0116 0zm-7-4a1 1 0 112 0v4a1 1 0 01-2 0V6zm1 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </div>
+
+    <div class="flex-1">
+
+      <p class="text-sm font-semibold text-gray-900">
+        Something went wrong
+      </p>
+
+      <p class="mt-1 text-sm text-gray-500">
+        <%= errorMessages[0] %>
+      </p>
+
+    </div>
+
+    <button
+      onclick="closeToast()"
+      class="text-gray-400 hover:text-gray-700 transition"
+    >
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+    </button>
+
+  </div>
+
+  <style>
+
+    @keyframes toast-in {
+      from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes toast-out {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      to {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+      }
+    }
+
+    .animate-toast-in {
+      animation: toast-in 0.25s ease forwards;
+    }
+
+    .animate-toast-out {
+      animation: toast-out 0.25s ease forwards;
+    }
+
+  </style>
+
+  <script>
+
+    const toast = document.getElementById("toast-error");
+
+    function closeToast() {
+
+      toast.classList.remove("animate-toast-in");
+
+      toast.classList.add("animate-toast-out");
+
+      setTimeout(() => {
+        toast.remove();
+      }, 250);
+    }
+
+    setTimeout(() => {
+
+      if (toast) {
+        closeToast();
+      }
+
+    }, 3000);
+
+  </script>
+
+<% } %>
+
+

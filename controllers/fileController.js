@@ -15,10 +15,8 @@ export async function uploadFile(req, res, next) {
     });
 
     if (!folder) {
-      return res.status(404).render("index", {
-        errors: [{ msg: "Folder Not Found" }],
-        old: req.body,
-      });
+      req.flash("error", "Folder Not Found");
+      return res.redirect(`/folders/${folderId}`);
     }
 
     await prisma.file.create({
@@ -35,9 +33,7 @@ export async function uploadFile(req, res, next) {
     res.redirect(`/folders/${folderId}`);
   } catch (err) {
     console.error(err);
-    res.status(500).render("index", {
-        error: [{ msg: "Upload Failed!" }],
-        old: req.body
-    })
+    req.flash("error", "Upload Failed!");
+    res.redirect(`/folders/${req.body.folderId}`);
   }
 };

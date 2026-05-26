@@ -7,6 +7,7 @@
     <title>File Uploader</title>
   </head>
   <body class="bg-gray-50 min-h-screen">
+    <%- include("partials/error.ejs", { messages: { error: errorMessages || [] } }) %>
     <%- include("partials/navbar.ejs", {name: user.name}) %>
     <main class="max-w-7xl mx-auto p-6">
       <div class="flex gap-6">
@@ -15,7 +16,7 @@
           <div class="mb-4">
             <%- include('partials/pathString.ejs') %>
           </div>
-          <%- include("partials/folders.ejs") %>
+          <%- include("partials/entries.ejs") %>
         </section>
       </div>
     </main>

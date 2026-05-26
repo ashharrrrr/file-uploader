@@ -11,6 +11,7 @@ import { prisma } from "./lib/prisma.js";
 import authRouter from "./routes/auth.routes.js";
 import folderRouter from "./routes/folder.routes.js";
 import fileRouter from "./routes/file.routes.js";
+import flash from "connect-flash";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -36,9 +37,14 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
 
 app.use((req, res, next) => {
   res.locals.user = req.user;
+
+  res.locals.successMessages = req.flash("success");
+  res.locals.errorMessages = req.flash("error");
+
   next();
 })
 

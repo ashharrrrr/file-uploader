@@ -1,7 +1,6 @@
 import { prisma } from "../lib/prisma.js";
 
 export async function getFolderData(folderId, userId) {
-
   const currentFolder = await prisma.folder.findFirst({
     where: {
       id: folderId,
@@ -47,17 +46,33 @@ export async function getFolderData(folderId, userId) {
   });
 
   const pathMap = {};
-  pathStringFolders.forEach(folder => {
+  pathStringFolders.forEach((folder) => {
     pathMap[folder.id] = folder;
   });
 
-  const pathString = pathStringIds.map(id => pathMap[id]);
+  const pathString = pathStringIds.map((id) => pathMap[id]);
 
-  
+  const entries = [
+    ...folders.map((folder) => ({
+      type: "folder",
+      ...folder,
+    })),
+
+    ...files.map((file) => ({
+      type: "file",
+      ...file,
+    })),
+  ];
+
+  const sortedEntries = [...entries].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+  );
+
   return {
     currentFolder,
     folders,
     files,
     pathString,
+    entries: sortedEntries,
   };
 }

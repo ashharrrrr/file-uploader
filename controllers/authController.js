@@ -20,11 +20,8 @@ export async function indexGet(req, res) {
 
   } catch (err) {
     console.error(err);
-    res.status(500).render("index", {
-        errors: [{ msg: "Server Error" }],
-        old: req.body
-    })
-    
+    req.flash("error", "Server Error");
+    res.redirect("/");
   }
 }
 
@@ -73,16 +70,12 @@ export const signUpUser = [
 
     } catch (err) {
       if (err.code === "P2002") {
-        return res.status(409).render("signUp", {
-          errors: [{ msg: "Email already exists!" }],
-          old: req.body,
-        });
+        req.flash("error", "Email already exists!");
+        return res.redirect("/signUp");
       }
       console.error(err);
-      return res.status(500).render("signUp", {
-        errors: [{msg: "Signup Failed!"}],
-        old: req.body,
-      })
+      req.flash("error", "Signup Failed!");
+      return res.redirect("/signUp");
     }
   },
 ];
