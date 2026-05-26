@@ -7,7 +7,6 @@
     <title>File Uploader</title>
   </head>
   <body class="bg-gray-50 min-h-screen">
-    <%- include("partials/error.ejs", { messages: { error: errorMessages || [] } }) %>
     <%- include("partials/navbar.ejs", {name: user.name}) %>
     <main class="max-w-7xl mx-auto p-6">
       <div class="flex gap-6">
@@ -20,14 +19,21 @@
         </section>
       </div>
     </main>
+    <div
+    id="toast-root"
+    class="fixed top-0 left-0 w-screen h-screen pointer-events-none z-[9999]"
+    ></div>
   </body>
 </html>
 
+<%- include("partials/toasts.ejs") %>
+<script src="/js/toast.js" ></script>
 <script>
   const CURRENT_FOLDER_ID = "<%= currentFolder.id %>";
 
   const SUPABASE_URL = "<%= process.env.SUPABASE_URL %>";
 
 </script>
+
 
 <script src="/js/upload.js"></script>

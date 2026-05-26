@@ -8,7 +8,8 @@ uploadForm.addEventListener("submit", async (e) => {
   const file = fileInput.files[0];
 
   if (!file) {
-    alert("No file selected");
+    console.log("NO FILE IDIOT")
+    showToast("No file selected!")
     return;
   }
 
@@ -30,6 +31,15 @@ uploadForm.addEventListener("submit", async (e) => {
         folderId: CURRENT_FOLDER_ID,
       }),
     });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+
+        showToast(
+            errorData.error || "Upload Failed!"
+        );
+        return;
+    }
 
     const data = await response.json();
 

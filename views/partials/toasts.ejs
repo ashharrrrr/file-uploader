@@ -1,0 +1,9 @@
+<div
+    <%= console.log(errorMessages) %>
+
+    <%= console.log(JSON.stringify(successMessages)) %>
+
+    id="flash-data"
+    data-errors='<%- JSON.stringify(errorMessages || []) %>'
+    data-success='<%- JSON.stringify(successMessages || []) %>'
+></div>

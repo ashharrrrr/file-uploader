@@ -1,12 +1,10 @@
 import { Router } from "express";
-import { uploadFile, downloadFile } from "../controllers/fileController.js"
-import multer from "multer";
-
-const upload = multer({dest: 'uploads/'})
-
+import { uploadFile, downloadFile, deleteFile } from "../controllers/fileController.js"
+console.log("FILE ROUTER LOADED")
 const fileRouter = Router();
 
 fileRouter.post("/signed-upload", uploadFile);
 fileRouter.get("/download/:fileId", downloadFile);
+fileRouter.post("/delete/:fileId", deleteFile);
 
 export default fileRouter;
