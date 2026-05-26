@@ -72,7 +72,6 @@ export async function getFolder(req, res, next) {
 export async function renameFolder(req, res, next) {
   try {
     const { name, folderId } = req.body;
-    console.log("BODY", req.body);
 
     const folder = await prisma.folder.findFirst({
       where: {

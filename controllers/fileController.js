@@ -1,8 +1,8 @@
-console.log("UPLOAD CONTROLLER HIT");
 import { prisma } from "../lib/prisma.js";
 import crypto from "crypto";
 import supabase from "../lib/supabase.js";
 import path from "path";
+import { error } from "console";
 
 export async function uploadFile(req, res, next) {
   try {
@@ -42,7 +42,6 @@ export async function uploadFile(req, res, next) {
       throw error;
     }
 
-    console.log("Creating prisma file...");
 
     await prisma.file.create({
       data: {
@@ -62,7 +61,6 @@ export async function uploadFile(req, res, next) {
       },
     });
 
-    console.log("Prisma file created.");
 
     return res.json({
       token: data.token,
@@ -75,6 +73,40 @@ export async function uploadFile(req, res, next) {
       error: err.message,
     });
   }
+}
+
+export async function downloadFile(req, res, next) {
+    try {
+        const file = await prisma.file.findFirst({
+            where:{
+                id: req.params.fileId,
+                userId: req.user.id
+            },
+        })
+
+        if (!file){
+            return res.status(404).json({
+                error: "File not found"
+            })
+        }
+
+        const { data, error } = await supabase.storage.from("drive-files").createSignedUrl(file.storagePath, 60, { download: file.name });
+
+        if(error){
+            throw error;
+        }
+
+        return res.redirect(
+            data.signedUrl
+        )
+    } catch(err){
+        console.error(err);
+
+        return res.status(500).json({
+            error: "Download Failed!"
+        })
+
+    }
 }
 
 
