@@ -44,7 +44,6 @@ export const createFolder = [
         req.flash("error", "Folder!! with this name already exists!");
         return res.redirect(`/folders/${req.body.parentId}`);
       }
-      console.error("PRISMA ERROR", err);
       req.flash("error", "Failed to create folder.");
       return res.redirect(`/folders/${req.body.parentId}`);
     }
@@ -98,7 +97,6 @@ export async function renameFolder(req, res, next) {
   } catch (err) {
     if (err.code === "P2002") {
       req.flash("error", "Folder by this name already exists!");
-      console.log(req.session.flash);
       return res.redirect(`/folders/${req.body.folderId}`);
     }
     console.error(err);
@@ -147,7 +145,6 @@ export async function deleteFolder(req, res, next) {
     });
 
     req.flash("success", "Folder deleted");
-    console.log(req.session.flash);
 
     return res.redirect(`/folders/${folder.parentId}`);
   } catch (err) {

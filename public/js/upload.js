@@ -5,11 +5,24 @@ uploadForm.addEventListener("submit", async (e) => {
 
   const fileInput = document.getElementById("file-input");
 
+  const fileLabel = document.getElementById("file-label");
+
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+
+    if (!file) {
+      fileLabel.innerText = "Choose File";
+
+      return;
+    }
+
+    fileLabel.innerText = file.name;
+  });
+
   const file = fileInput.files[0];
 
   if (!file) {
-    console.log("NO FILE IDIOT")
-    showToast("No file selected!")
+    showToast("No file selected!");
     return;
   }
 
@@ -33,12 +46,10 @@ uploadForm.addEventListener("submit", async (e) => {
     });
 
     if (!response.ok) {
-        const errorData = await response.json();
+      const errorData = await response.json();
 
-        showToast(
-            errorData.error || "Upload Failed!"
-        );
-        return;
+      showToast(errorData.error || "Upload Failed!");
+      return;
     }
 
     const data = await response.json();
@@ -62,9 +73,14 @@ uploadForm.addEventListener("submit", async (e) => {
     }
 
     window.location.reload();
+    fileLabel.innerText =
+  "Choose File";
+
+fileInput.value = "";
   } catch (err) {
     console.error("UPLOAD ERROR:", err);
-
-    alert(err.message);
+    showToast(
+        "Something went wrong!"
+    )
   }
 });

@@ -55,7 +55,6 @@ const flashData =
   );
 
 if (flashData) {
-    console.log("FLASH DATA", flashData)
   const errors =
     JSON.parse(
       flashData.dataset.errors

@@ -3,11 +3,9 @@ import crypto from "crypto";
 import supabase from "../lib/supabase.js";
 import path from "path";
 import { error } from "console";
-console.log("UPLOAD FILE HIT")
 
 export async function uploadFile(req, res, next) {
   try {
-    console.log("server listening")
     const { fileName, mimeType, size, folderId } = req.body;
 
     const allowedTypes = [
@@ -23,7 +21,6 @@ export async function uploadFile(req, res, next) {
         error: "Invalid file type",
       });
     }
-    console.log(size)
     if (size > 10 * 1024 * 1024) {
         return res.status(400).json({
             error: "Max file size is 10MB"
@@ -40,9 +37,6 @@ export async function uploadFile(req, res, next) {
       .from("drive-files")
       .createSignedUploadUrl(storagePath);
 
-    if (error) {
-      throw error;
-    }
 
     await prisma.file.create({
       data: {
@@ -68,6 +62,11 @@ export async function uploadFile(req, res, next) {
     });
   } catch (err) {
     console.error(err);
+    if (err.code === "P2002"){
+        return res.status(409).json({
+            error: "File with this name already exists!"
+        });
+    }
 
     return res.status(500).json({
       error: err.message,
