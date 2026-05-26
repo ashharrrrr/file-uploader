@@ -15,7 +15,6 @@ const addUser = async (name, email, password) => {
 };
 
 const addFile = async ({ name, mimeType, size }) => {
-  console.log("WORKING!!!");
   const file = await prisma.file.create({
     data: {
       name,
@@ -23,7 +22,6 @@ const addFile = async ({ name, mimeType, size }) => {
       size,
     },
   });
-  console.log("uploaded");
 };
 
 export const db = {

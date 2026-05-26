@@ -1,0 +1,59 @@
+<aside class="space-y-6">
+  <!-- Upload button partial -->
+  <%- include('./uploadButton.ejs') %>
+
+  <!-- New Folder button -->
+  <div>
+    <button
+      id="open-add-folder"
+      type="button"
+      class="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:cursor-pointer hover:bg-gray-50">
+      <svg
+        class="-ml-1 mr-2 h-5 w-5 text-gray-500"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden="true">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 4v16m8-8H4" />
+      </svg>
+      New Folder
+    </button>
+  </div>
+
+  <!-- Add Folder Modal (hidden by default) -->
+  <div
+    id="add-folder-modal"
+    class="fixed inset-0 z-50 hidden flex items-center justify-center bg-gray-200 bg-opacity-40 backdrop-blur-sm">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 mx-4">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium">Create Folder</h3>
+        <button
+          id="close-add-folder"
+          class="text-gray-500 hover:cursor-pointer hover:text-gray-700">
+          ✕
+        </button>
+      </div>
+      <div><%- include('./addFolder.ejs', {currentFolder: currentFolder}) %></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const openBtn = document.getElementById("open-add-folder");
+      const closeBtn = document.getElementById("close-add-folder");
+      const modal = document.getElementById("add-folder-modal");
+      if (!openBtn || !modal) return;
+      openBtn.addEventListener("click", () => modal.classList.remove("hidden"));
+      if (closeBtn)
+        closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
+      // close when clicking backdrop
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) modal.classList.add("hidden");
+      });
+    })();
+  </script>
+</aside>

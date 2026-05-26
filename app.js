@@ -37,6 +37,11 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  next();
+})
+
 const assetPath = path.join(__dirname, "public");
 app.use(express.static(assetPath));
 app.use(express.urlencoded({ extended: true }));

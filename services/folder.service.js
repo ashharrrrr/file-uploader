@@ -1,0 +1,63 @@
+import { prisma } from "../lib/prisma.js";
+
+export async function getFolderData(folderId, userId) {
+
+  const currentFolder = await prisma.folder.findFirst({
+    where: {
+      id: folderId,
+      userId,
+    },
+  });
+
+  if (!currentFolder) {
+    return res.status(404).render("index", {
+      errors: [{ msg: "Folder not found!" }],
+      old: req.body,
+    });
+  }
+
+  const folders = await prisma.folder.findMany({
+    where: {
+      parentId: folderId,
+      userId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const files = await prisma.file.findMany({
+    where: {
+      folderId,
+      userId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const pathStringIds = currentFolder.path.split("/").filter(Boolean);
+
+  const pathStringFolders = await prisma.folder.findMany({
+    where: {
+      id: {
+        in: pathStringIds,
+      },
+    },
+  });
+
+  const pathMap = {};
+  pathStringFolders.forEach(folder => {
+    pathMap[folder.id] = folder;
+  });
+
+  const pathString = pathStringIds.map(id => pathMap[id]);
+
+  
+  return {
+    currentFolder,
+    folders,
+    files,
+    pathString,
+  };
+}

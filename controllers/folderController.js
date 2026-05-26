@@ -1,9 +1,12 @@
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib/prisma.js";
+import { getFolderData } from "../services/folder.service.js";
 
 export const createFolder = [
   async (req, res) => {
     try {
       const userId = req.user.id;
+
+      console.log("createFOlder", req.body);
 
       const { name, parentId } = req.body;
 
@@ -14,10 +17,14 @@ export const createFolder = [
         },
       });
 
+      console.log("PARENT FOLDER", parentFolder)
+
       if (!parentFolder) {
+        console.log("THIS IS EXECUTING!!")
         return res.status(409).render("index", {
           errors: [{ msg: "Parent folder not found." }],
           old: req.body,
+          user: req.user,
         });
       }
 
@@ -30,6 +37,7 @@ export const createFolder = [
         },
       });
 
+      console.log("FOLDER", folder)
       folder = await prisma.folder.update({
         where: {
           id: folder.id,
@@ -39,6 +47,7 @@ export const createFolder = [
         },
       });
 
+      console.log("PARENT ID", parentId);
       res.redirect(`/folders/${parentId}`);
     } catch (err) {
       if (err.code === "P2002") {
@@ -47,7 +56,7 @@ export const createFolder = [
           old: req.body,
         });
       }
-      console.error(err);
+      console.error("PRISMA ERROR", err);
       return res.status(500).render("index", {
         errors: [{ msg: "Failed to create folder." }],
         old: req.body,
@@ -57,69 +66,28 @@ export const createFolder = [
 ];
 
 export async function getFolder(req, res, next) {
-    try{
-        const userId = req.user.id;
+  try {
 
-        const folderId = req.params.folderId;
+    console.log("SETP 1")
 
-        const currentFolder = await prisma.folder.findFirst({
-            where: {
-                id: folderId,
-                userId
-            }
-        })
+    const userId = req.user.id;
 
-        if (!currentFolder) {
-            return res.status(404).render("index", {
-                errors: [{ msg: "Folder not found!" }],
-                old: req.body
-            })
-        }
+    const folderId = req.params.folderId;
 
-        const folders = await prisma.folder.findMany({
-            where: {
-                parentId: folderId,
-                userId
-            },
-            orderBy: {
-                createdAt: "desc"
-            }
-        });
+    console.log("SETP 2", folderId)
 
-        const files = await prisma.file.findMany({
-            where:{
-                folderId,
-                userId
-            },
-            orderBy: {
-                createdAt: "desc"
-            }
-        });
+    const data = await getFolderData(folderId, userId);
 
-        const pathStringIds = currentFolder.path.split("/");
+    console.log("STEP 3", data)
 
-        const pathStringFolders = await prisma.folder.findMany({
-            where: {
-                id: {
-                    in: pathStringIds
-                }
-            }
-        });
-
-        const pathString = pathStringIds.map(id => pathStringFolders.find(folder => folder.id === id));
-
-        res.render("folder", {
-            currentFolder,
-            folders,
-            files,
-            pathString
-        })
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).render("index", {
-            errors: [{ msg: "Failed to load folder." }],
-            old: req.body
-        })
-    }
+    res.render("index", {
+        ...data
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).render("index", {
+      errors: [{ msg: "Failed to load folder." }],
+      old: req.body,
+    });
+  }
 }

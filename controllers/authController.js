@@ -1,13 +1,31 @@
-import bcrypt from "bcryptjs";
+import bcrypt, { hash } from "bcryptjs";
 import { db } from "../db/queries.js";
 import passport from "passport";
 import "../strategies/passportlocal.config.js";
 import { prisma } from "../lib/prisma.js";
+import { getFolderData } from "../services/folder.service.js";
 
 export async function indexGet(req, res) {
   if (!req.user) return res.redirect("/login");
-  const user = req.user;
-  return res.render("index", { user });
+  try {
+   const data = await getFolderData(
+    req.user.rootFolderId,
+    req.user.id
+   );
+
+   res.render("index", {
+    user: req.user,
+    ...data
+   });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).render("index", {
+        errors: [{ msg: "Server Error" }],
+        old: req.body
+    })
+    
+  }
 }
 
 export const signUpUser = [
@@ -15,7 +33,14 @@ export const signUpUser = [
     try {
       const { name, email, password } = req.body; 
       const hashedPassword = await bcrypt.hash(password, 10);
-      await db.addUser(name, email, hashedPassword);
+
+      const user = await prisma.user.create({
+        data: {
+            name,
+            email,
+            password: hashedPassword
+        },
+      })
 
       let rootFolder = await prisma.folder.create({
         data: {
@@ -63,7 +88,6 @@ export const signUpUser = [
 ];
 
 export const loginUser = (req, res, next) => {
-  console.log("loginUser handler invoked");
   return passport.authenticate("local", {
     successRedirect: "/",
     failureRedirect: "/signUp",
