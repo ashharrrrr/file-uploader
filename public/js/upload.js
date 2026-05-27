@@ -27,6 +27,10 @@ uploadForm.addEventListener("submit", async (e) => {
   }
 
   try {
+    const submitButton = uploadForm.querySelector("button[type='submit']");
+
+    setButtonLoading(submitButton, "Uploading...");
+
     const response = await fetch("/files/signed-upload", {
       method: "POST",
 
@@ -73,14 +77,12 @@ uploadForm.addEventListener("submit", async (e) => {
     }
 
     window.location.reload();
-    fileLabel.innerText =
-  "Choose File";
+    fileLabel.innerText     = "Choose File";
 
-fileInput.value = "";
+    fileInput.value = "";
   } catch (err) {
+    resetButtonLoading(submitButton);
     console.error("UPLOAD ERROR:", err);
-    showToast(
-        "Something went wrong!"
-    )
+    showToast("Something went wrong!");
   }
 });

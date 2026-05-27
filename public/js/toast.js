@@ -3,6 +3,8 @@ function showToast(
   type = "error"
 ) {
 
+  console.log(flashData?.dataset.errors);
+
   const toast =
     document.createElement("div");
 
