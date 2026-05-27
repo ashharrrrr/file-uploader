@@ -53,10 +53,21 @@ model Folder {
   children  Folder[] @relation("FolderTree")
   files     File[]
   rootOwner User?    @relation("UserRootFolder")
+
+  shares  sharedFolder[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([userId, parentId, name])
+}
+
+model sharedFolder {
+  id String @id @default(cuid())
+  token String @unique
+  folderId  String
+  folder  Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
 
 model Session {

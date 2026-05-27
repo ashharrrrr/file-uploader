@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/output.css" />
+    <title>Shared Folder</title>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <main class="max-w-5xl mx-auto p-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h1 class="text-3xl font-bold mb-6 text-gray-900">
+          <%= currentFolder.name %>
+        </h1>
+
+        <%- include("partials/sharedPathString.ejs") %>
+        <div class="space-y-3">
+          <% currentFolder.children.forEach(folder => { %>
+            <a
+              href="/shared/<%= shareToken %>/folder/<%= folder.id %>"
+              class="flex items-center justify-between gap-4 p-4 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 transition"
+            >
+              <span class="font-medium text-gray-900">📁 <%= folder.name %></span>
+            </a>
+          <% }) %>
+
+          <% currentFolder.files.forEach(file => { %>
+            <a
+              href="/shared/<%= shareToken %>/download/<%= file.id %>"
+              class="flex items-center justify-between gap-4 p-4 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 transition"
+            >
+              <span class="font-medium text-gray-900">📄 <%= file.name %></span>
+            </a>
+          <% }) %>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

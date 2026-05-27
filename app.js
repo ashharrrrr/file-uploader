@@ -10,6 +10,7 @@ import { prisma } from "./lib/prisma.js";
 import authRouter from "./routes/auth.routes.js";
 import folderRouter from "./routes/folder.routes.js";
 import fileRouter from "./routes/file.routes.js";
+import sharedRouter from "./routes/sharedFile.router.js";
 import flash from "connect-flash";
 
 
@@ -56,6 +57,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/", authRouter);
 app.use("/folders", folderRouter);
 app.use("/files", fileRouter);
+app.use("/shared", sharedRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
