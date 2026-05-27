@@ -67,6 +67,7 @@ model sharedFolder {
   token String @unique
   folderId  String
   folder  Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  expiresAt DateTime?
   createdAt DateTime @default(now())
 }
 

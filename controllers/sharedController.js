@@ -29,10 +29,13 @@ export async function createShareLink(req, res) {
 
     const token = crypto.randomUUID();
 
+    const expiresAt = new Date(Date.now() + 1000 * 60);
+
     const share = await prisma.sharedFolder.create({
       data: {
         token,
         folderId: folder.id,
+        expiresAt,
       },
     });
 
@@ -48,18 +51,12 @@ export async function createShareLink(req, res) {
   }
 }
 
-async function buildSharedPath(
-  folder
-) {
-
+async function buildSharedPath(folder) {
   if (!folder.path) {
     return [];
   }
 
-  const pathIds =
-    folder.path
-      .split("/")
-      .filter(Boolean);
+  const pathIds = folder.path.split("/").filter(Boolean);
 
   return await prisma.folder.findMany({
     where: {
@@ -106,12 +103,15 @@ export async function viewSharedRoot(req, res) {
     if (!share) {
       return res.status(404).send("shared folder not found!");
     }
+    if (share.expiresAt && share.expiresAt < new Date()) {
+      return res.status(403).send("Share link expired");
+    }
     const pathString = await buildSharedPath(share.folder);
 
     return res.render("sharedFolder", {
       currentFolder: share.folder,
       shareToken: share.token,
-      pathString
+      pathString,
     });
   } catch (err) {
     console.error(err);
@@ -134,7 +134,9 @@ export async function viewSharedFolder(req, res) {
     if (!share) {
       return res.status(404).send("Shared folder not found");
     }
-
+    if (share.expiresAt && share.expiresAt < new Date()) {
+      return res.status(403).send("Share link expired");
+    }
     const folder = await prisma.folder.findUnique({
       where: {
         id: req.params.folderId,
@@ -193,7 +195,9 @@ export async function downloadSharedFile(req, res) {
     if (!share) {
       return res.status(404).send("Shared folder not found");
     }
-
+    if (share.expiresAt && share.expiresAt < new Date()) {
+      return res.status(403).send("Share link expired");
+    } 
     const file = await prisma.file.findUnique({
       where: {
         id: req.params.fileId,
@@ -221,12 +225,9 @@ export async function downloadSharedFile(req, res) {
     }
 
     return res.redirect(data.signedUrl);
-
   } catch (err) {
     console.error(err);
 
-    return res.status(500).send(
-      "Download failed"
-    );
+    return res.status(500).send("Download failed");
   }
 }
