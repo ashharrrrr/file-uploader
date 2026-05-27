@@ -15,21 +15,11 @@ export async function createShareLink(req, res) {
       return res.status(404).json({ error: "Folder not found!" });
     }
 
-    const existingShare = await prisma.sharedFolder.findFirst({
-      where: {
-        folderId: folder.id,
-      },
-    });
-
-    if (existingShare) {
-      return res.json({
-        url: `${req.protocol}://${req.get("host")}/shared/${existingShare.token}`,
-      });
-    }
-
     const token = crypto.randomUUID();
 
-    const expiresAt = new Date(Date.now() + 1000 * 60);
+    const { expirySeconds } = req.body || {};
+
+    const expiresAt = expirySeconds ? new Date(Date.now() + Number(expirySeconds) * 1000) : null;
 
     const share = await prisma.sharedFolder.create({
       data: {

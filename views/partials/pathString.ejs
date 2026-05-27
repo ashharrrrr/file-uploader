@@ -65,7 +65,7 @@
 
     <% if (currentFolder.parentId) { %>
 
-        <div class="flex items-center gap-2 flex-shrink-0">
+        <div class="flex items-center gap-2 shrink-0">
 
             <a
                 href="/folders/rename/<%= currentFolder.id %>"
@@ -85,22 +85,54 @@
                 Rename
             </a>
 
-            <button
-                type="button"
-                onclick="createShareLink('<%= currentFolder.id %>')"
-                class="
-                    inline-flex items-center justify-center
-                    px-4 py-2
-                    rounded-xl
-                    bg-blue-500
-                    text-white
-                    text-sm font-medium
-                    hover:bg-blue-600
-                    transition
-                "
-            >
-                Share
-            </button>
+            <div class="inline-flex gap-2 items-stretch rounded-xl border border-gray-200 overflow-hidden bg-white">
+                <select
+                    id="share-expiry"
+                    class="
+                      px-3 py-2
+                      rounded-none
+                      border-0
+                      bg-white
+                      text-sm
+                      text-gray-700
+                      outline-none
+                      focus:ring-0
+                    "
+                >
+                    <option value="60">
+                        1 minute
+                    </option>
+                    <option value="3600">
+                        1 hour
+                    </option>
+                    <option value="86400">
+                        1 day
+                    </option>
+                    <option value="604800">
+                        1 week
+                    </option>
+                    <option value="">
+                        Never
+                    </option>
+                </select>
+
+                <button
+                    type="button"
+                    onclick="createShareLink('<%= currentFolder.id %>')"
+                    class="
+                        inline-flex items-center justify-center
+                        px-4 py-2
+                        bg-blue-500
+                        text-white
+                        text-sm font-medium
+                        hover:bg-blue-600
+                        transition
+                        rounded-2xl
+                    "
+                >
+                    Share
+                </button>
+            </div>
 
             <form
                 action="/folders/delete/<%= currentFolder.id %>?_method=DELETE"
