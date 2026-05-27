@@ -1,6 +1,8 @@
 {
   "type": "module",
-  "postinstall": "npx prisma generate",
+  "scripts": {
+    "postinstall": "prisma generate"
+  },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
